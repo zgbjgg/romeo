@@ -117,7 +117,7 @@ defmodule Romeo.Connection do
   end
   def handle_call(:close, from, %{socket: socket, transport: transport} = conn) do
     transport.disconnect({:close, from}, socket)
-    {:reply, :ok, conn}
+    {:stop, {:shutdown, :closed}, conn}
   end
 
   def handle_info(info, %{owner: owner, transport: transport} = conn) do

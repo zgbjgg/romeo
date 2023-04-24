@@ -152,7 +152,7 @@ defmodule Romeo.Transports.TCP do
     {:ok, conn}
   end
 
-  defp ready({:error, error), do: {:error, error}
+  defp ready({:error, error}), do: {:error, error}
 
   defp reset_parser(%Conn{parser: parser} = conn) do
     parser = :fxml_stream.reset(parser)

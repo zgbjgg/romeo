@@ -144,19 +144,15 @@ defmodule Romeo.Transports.TCP do
 
     conn
     |> send(stanza)
-    |> recv(fn conn, xmlel(name: "iq") = stanza ->
-      "result" = Romeo.XML.attr(stanza, "type")
-      ^id = Romeo.XML.attr(stanza, "id")
-
-      Logger.info fn -> "Session established" end
-      conn
-    end)
+    |> recv(&handle_session_established/2)
   end
 
   defp ready(%Conn{owner: owner} = conn) do
     Kernel.send(owner, :connection_ready)
     {:ok, conn}
   end
+
+  defp ready({:error, error), do: {:error, error}
 
   defp reset_parser(%Conn{parser: parser} = conn) do
     parser = :fxml_stream.reset(parser)
@@ -302,5 +298,17 @@ defmodule Romeo.Transports.TCP do
 
   defp host(jid) do
     Romeo.JID.parse(jid).server
+  end
+
+  defp handle_session_established(conn, xmlel(name: "iq") = stanza) do
+    "result" = Romeo.XML.attr(stanza, "type")
+    ^id = Romeo.XML.attr(stanza, "id")
+
+    Logger.info fn -> "Session established" end
+    conn
+  end
+
+  defp handle_session_established(_conn, _) do
+    {:error, "Error while stream, maybe replaced connection"}
   end
 end

@@ -144,7 +144,7 @@ defmodule Romeo.Transports.TCP do
 
     conn
     |> send(stanza)
-    |> recv(&handle_session_established/2)
+    |> recv(&handle_session_established(&1, &2, id))
   end
 
   defp ready(%Conn{owner: owner} = conn) do
@@ -300,7 +300,7 @@ defmodule Romeo.Transports.TCP do
     Romeo.JID.parse(jid).server
   end
 
-  defp handle_session_established(conn, xmlel(name: "iq") = stanza) do
+  defp handle_session_established(conn, xmlel(name: "iq") = stanza, id) do
     "result" = Romeo.XML.attr(stanza, "type")
     ^id = Romeo.XML.attr(stanza, "id")
 
